@@ -11,6 +11,7 @@ const wss = new WebSocket.Server({ server });
 
 // Middleware to parse JSON data
 app.use(express.json()); //
+app.use(express.urlencoded({ extended: true })); // Add this to handle form-encoded data
 
 // Store active WebSocket connections
 let connections = new Map();
