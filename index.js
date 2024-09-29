@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Middleware to parse JSON data
-app.use(express.json());
+app.use(express.json()); //
 
 // Store active WebSocket connections
 let connections = new Map();
