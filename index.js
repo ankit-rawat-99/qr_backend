@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const WebSocket = require('ws');
+const { v4: uuidv4 } = require('uuid'); // Use UUID for token generation
 const port = process.env.PORT || 3000;
 
 // Create an HTTP server and WebSocket server
@@ -18,14 +19,21 @@ let connections = new Map();
 wss.on('connection', (ws) => {
     console.log('New WebSocket connection');
 
+    // Generate a unique token for this session
+    const token = uuidv4(); // Generate a UUID token
+    connections.set(token, ws); // Store WebSocket connection with the token
+    
+    // Send the token to the client
+    ws.send(JSON.stringify({ token }));
+
+    // Handle incoming WebSocket messages
     ws.on('message', (message) => {
-        // Expect the message to be JSON containing the token and user information
         try {
             const data = JSON.parse(message);
+            
             if (data.type === 'INIT') {
-                // Store connection for the user, identified by token
-                connections.set(data.token, ws);
-                console.log(`Connection initialized for token: ${data.token}`);
+                console.log(`WebSocket initialized for token: ${token}`);
+                // You can do more logic if necessary, such as updating the connection map
             }
         } catch (err) {
             console.error('Error parsing WebSocket message:', err);
@@ -34,6 +42,8 @@ wss.on('connection', (ws) => {
 
     ws.on('close', () => {
         console.log('WebSocket connection closed');
+        // Optionally remove the connection from the map
+        connections.delete(token);
     });
 });
 
