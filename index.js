@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const WebSocket = require('ws');
-const { v4: uuidv4 } = '123456'; // Use UUID for token generation
+const { v4: uuidv4 } = require('uuid'); // Use UUID for token generation
+
 const port = process.env.PORT || 3000;
 
 // Create an HTTP server and WebSocket server
