@@ -51,19 +51,23 @@ wss.on('connection', (ws) => {
 // Endpoint to verify token sent from the app
 app.post('/verify-token', (req, res) => {
     const { token } = req.body;
+  // Log the received token
+  console.log('Received token from app:', token);
 
-    // Dummy token verification logic
-    if (token === 'VALID_TOKEN') {
-        // Check if there's an active WebSocket connection for the token
+     // Verify the token
+    if (connections.has(token)) {
         const ws = connections.get(token);
+
         if (ws && ws.readyState === WebSocket.OPEN) {
-            // Send login success message via WebSocket
+            console.log('Token is valid, sending login success message to website.');
             ws.send(JSON.stringify({ success: true, message: 'Login successful!' }));
             res.status(200).json({ success: true, message: 'Token is valid.' });
         } else {
-            res.status(400).json({ success: false, message: 'No active connection for token.' });
+            console.log('WebSocket connection not active for token:', token);
+            res.status(400).json({ success: false, message: 'WebSocket connection is not active.' });
         }
     } else {
+        console.log('Invalid token received:', token);
         res.status(400).json({ success: false, message: 'Invalid token.' });
     }
 });
